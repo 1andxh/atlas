@@ -3,3 +3,6 @@
 
 # Ignore history folder if using the Local History extension
 .vscode/plugins/
+
+
+__pycache__
