@@ -21,27 +21,29 @@ class Job:
     payload: dict[str, Any]
     status: JobStatus
     available_at: datetime
-    worker_id: uuid.UUID
-
-    def __init__(self, status: JobStatus, worker_id: uuid.UUID) -> None:
-        self.status = status
-        self.worker_id = worker_id
+    worker_id: uuid.UUID | None = None
 
     def claim(self, worker_id: uuid.UUID) -> None:
         if self.status != JobStatus.PENDING:
-            raise InvalidJobState()
+            raise InvalidJobState(
+                f"Job ID: {self.id} cannot be completed in current state '{self.status.upper()}'"
+            )
 
         self.status = JobStatus.RUNNING
         self.worker_id = worker_id
 
     def complete(self) -> None:
         if self.status != JobStatus.RUNNING:
-            raise InvalidJobState()
+            raise InvalidJobState(
+                f"Job ID: {self.id} cannot be completed in current state '{self.status.upper()}'"
+            )
 
         self.status = JobStatus.COMPLETED
 
     def fail(self) -> None:
-        if self.status != JobStatus.RUNNING:  # or JobStatus.COMPLETED ??:
-            raise InvalidJobState()
+        if self.status != JobStatus.RUNNING:
+            raise InvalidJobState(
+                f"Job ID: {self.id} cannot be completed in current state '{self.status.upper()}'"
+            )
 
         self.status = JobStatus.FAILED
